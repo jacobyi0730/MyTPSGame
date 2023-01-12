@@ -1,10 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "TPSPlayer.generated.h"
+
+class USpringArmComponent; // 전방선언
 
 UCLASS()
 class MYTPSGAME_API ATPSPlayer : public ACharacter
@@ -26,4 +28,19 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY(EditAnywhere)
+	class USpringArmComponent* springArmComp; 
+
+	UPROPERTY(EditAnywhere)
+	class UCameraComponent* cameraComp;
+
+
+	void OnAxisHorizontal(float value);
+	void OnAxisVertical(float value);
+	void OnAxisLookUp(float value);
+	void OnAxisTurnRight(float value);
+	void OnActionJump();
+	
+	FVector direction;
+	float walkSpeed = 600;
 };
