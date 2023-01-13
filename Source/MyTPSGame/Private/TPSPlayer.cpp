@@ -5,6 +5,7 @@
 #include <GameFramework/SpringArmComponent.h>
 #include <Camera/CameraComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
+#include "BulletActor.h"
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
@@ -41,6 +42,19 @@ ATPSPlayer::ATPSPlayer()
 	cameraComp->bUsePawnControlRotation = true;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	// 일반총의 컴포넌트를 만들고싶다.
+	gunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("gunMeshComp"));
+	gunMeshComp->SetupAttachment(GetMesh());
+	// 일반총의 에셋을 읽어서 컴포넌트에 넣고싶다.
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempGunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/FPWeapon/Mesh/SK_FPGun.SK_FPGun'"));
+	if (tempGunMesh.Succeeded())
+	{
+		gunMeshComp->SetSkeletalMesh(tempGunMesh.Object);
+		gunMeshComp->SetRelativeLocationAndRotation(FVector(0, 50, 130), FRotator(0, 0, 0));
+	}
+
+
 }
 
 // Called when the game starts or when spawned
@@ -82,6 +96,10 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAxis(TEXT("Turn Right"), this, &ATPSPlayer::OnAxisTurnRight);
 
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ATPSPlayer::OnActionJump);
+
+	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &ATPSPlayer::OnActionFirePressed);
+
+	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Released, this, &ATPSPlayer::OnActionFireReleased);
 }
 
 void ATPSPlayer::OnAxisHorizontal(float value)
@@ -109,5 +127,25 @@ void ATPSPlayer::OnAxisTurnRight(float value)
 void ATPSPlayer::OnActionJump()
 {
 	Jump();
+}
+
+void ATPSPlayer::OnActionFirePressed()
+{
+	DoFire();
+}
+
+void ATPSPlayer::OnActionFireReleased()
+{
+
+}
+
+void ATPSPlayer::DoFire()
+{
+	// 플레이어 1M앞
+	
+	FTransform t = gunMeshComp->GetSocketTransform(TEXT("FirePosition"));
+
+	GetWorld()->SpawnActor<ABulletActor>(bulletFactory, t);
+		
 }
 

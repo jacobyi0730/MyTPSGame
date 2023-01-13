@@ -40,7 +40,20 @@ public:
 	void OnAxisLookUp(float value);
 	void OnAxisTurnRight(float value);
 	void OnActionJump();
+	void OnActionFirePressed();
+	void OnActionFireReleased();
+
+	void DoFire();
+
+	// 마우스 왼쪽버튼을 누르면 총알공장에서 총알을 만들어서 총구위치에 배치하고싶다.
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ABulletActor> bulletFactory;
 	
 	FVector direction;
 	float walkSpeed = 600;
+
+	UPROPERTY(EditAnywhere)
+	class USkeletalMeshComponent* gunMeshComp;
+	
 };
+
