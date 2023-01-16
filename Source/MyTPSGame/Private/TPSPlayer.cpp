@@ -131,12 +131,14 @@ void ATPSPlayer::OnActionJump()
 
 void ATPSPlayer::OnActionFirePressed()
 {
+	GetWorldTimerManager().SetTimer(fireTimerHandle, this, &ATPSPlayer::DoFire, fireInterval, true);
+
 	DoFire();
 }
 
 void ATPSPlayer::OnActionFireReleased()
 {
-
+	GetWorldTimerManager().ClearTimer(fireTimerHandle);
 }
 
 void ATPSPlayer::DoFire()
@@ -144,6 +146,7 @@ void ATPSPlayer::DoFire()
 	// 플레이어 1M앞
 	
 	FTransform t = gunMeshComp->GetSocketTransform(TEXT("FirePosition"));
+	//t.SetRotation(FQuat(GetControlRotation()));
 
 	GetWorld()->SpawnActor<ABulletActor>(bulletFactory, t);
 		

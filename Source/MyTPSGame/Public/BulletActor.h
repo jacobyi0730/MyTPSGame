@@ -34,4 +34,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* movementComp;
 
+	UFUNCTION()
+	void OnDie();
+
 };

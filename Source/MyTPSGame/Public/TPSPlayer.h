@@ -31,7 +31,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* springArmComp; 
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UCameraComponent* cameraComp;
 
 
@@ -52,8 +52,14 @@ public:
 	FVector direction;
 	float walkSpeed = 600;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class USkeletalMeshComponent* gunMeshComp;
 	
+	UPROPERTY(EditAnywhere)
+	float fireInterval = 0.5f;
+	
+	FTimerHandle fireTimerHandle;
+
+
 };
 
