@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "TPSPlayer.generated.h"
 
+#define GRENADE_GUN true
+#define SNIPER_GUN false
+
 class USpringArmComponent; // 전방선언
 
 UCLASS()
@@ -54,11 +57,36 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class USkeletalMeshComponent* gunMeshComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	class UStaticMeshComponent* sniperMeshComp;
 	
 	UPROPERTY(EditAnywhere)
 	float fireInterval = 0.5f;
 	
 	FTimerHandle fireTimerHandle;
+
+	bool bChooseGrenadeGun;
+	void ChooseGun(bool bGrenade);
+
+	// 위젯공장에서 위젯을 생성하고싶다. Crosshair, Sniper
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> crosshairFactory;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> sniperFactory;
+
+	UPROPERTY()
+	class UUserWidget* crosshairUI;
+	UPROPERTY()
+	class UUserWidget* sniperUI;
+
+	// 1번키와 2번키에대한 (총교체)입력처리를 하고싶다.
+	void OnActionGrenade();
+	void OnActionSniper();
+
+	// Zoom을 구현하고싶다. In / Out
+	void OnActionZoomIn();	// 확대 FOV 30
+	void OnActionZoomOut();	// 축소 FOV 90
 
 
 };

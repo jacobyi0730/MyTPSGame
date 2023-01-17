@@ -6,11 +6,12 @@
 #include <Camera/CameraComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
 #include "BulletActor.h"
+#include "Blueprint/UserWidget.h"
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	// sudo code 의사코드 => 알고리즘
@@ -32,7 +33,7 @@ ATPSPlayer::ATPSPlayer()
 	springArmComp->SetupAttachment(RootComponent);
 	// 카메라는 스프링암에 붙이고싶다.
 	cameraComp->SetupAttachment(springArmComp);
-	
+
 	springArmComp->SetRelativeLocation(FVector(0, 50, 100));
 	springArmComp->TargetArmLength = 250;
 
@@ -54,6 +55,18 @@ ATPSPlayer::ATPSPlayer()
 		gunMeshComp->SetRelativeLocationAndRotation(FVector(0, 50, 130), FRotator(0, 0, 0));
 	}
 
+	sniperMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("sniperMeshComp"));
+
+	sniperMeshComp->SetupAttachment(GetMesh());
+
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tempSniper(TEXT("/Script/Engine.StaticMesh'/Game/SniperGun/sniper1.sniper1'"));
+
+	if (tempSniper.Succeeded())
+	{
+		sniperMeshComp->SetStaticMesh(tempSniper.Object);
+		sniperMeshComp->SetRelativeLocationAndRotation(FVector(0, 60, 140), FRotator(0, 0, 0));
+		sniperMeshComp->SetRelativeScale3D(FVector(0.15f));
+	}
 
 }
 
@@ -61,6 +74,18 @@ ATPSPlayer::ATPSPlayer()
 void ATPSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+	// UI를 생성하고싶다.
+	crosshairUI = CreateWidget(GetWorld(), crosshairFactory);
+	sniperUI = CreateWidget(GetWorld(), sniperFactory);
+	// crosshairUI를 화면에 표시하고싶다.
+	crosshairUI->AddToViewport();
+
+	ChooseGun(GRENADE_GUN);
+
+	// 1. 태어날 때 cui를 보이게하고싶다.
+	// 2. 스나이퍼건일때 ZoomIn을 하면 cui X, sui O
+	// 3. 스나이퍼건일때 ZoomOut을 하면 cui O, sui X
+	// 4. 기본총을 선택하면 cui O, sui X
 }
 
 // Called every frame
@@ -100,6 +125,14 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &ATPSPlayer::OnActionFirePressed);
 
 	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Released, this, &ATPSPlayer::OnActionFireReleased);
+
+	PlayerInputComponent->BindAction(TEXT("GrenadeGun"), IE_Pressed, this, &ATPSPlayer::OnActionGrenade);
+
+	PlayerInputComponent->BindAction(TEXT("SniperGun"), IE_Pressed, this, &ATPSPlayer::OnActionSniper);
+
+	PlayerInputComponent->BindAction(TEXT("Zoom"), IE_Pressed, this, &ATPSPlayer::OnActionZoomIn);
+
+	PlayerInputComponent->BindAction(TEXT("Zoom"), IE_Released, this, &ATPSPlayer::OnActionZoomOut);
 }
 
 void ATPSPlayer::OnAxisHorizontal(float value)
@@ -144,11 +177,64 @@ void ATPSPlayer::OnActionFireReleased()
 void ATPSPlayer::DoFire()
 {
 	// 플레이어 1M앞
-	
+
 	FTransform t = gunMeshComp->GetSocketTransform(TEXT("FirePosition"));
 	//t.SetRotation(FQuat(GetControlRotation()));
 
 	GetWorld()->SpawnActor<ABulletActor>(bulletFactory, t);
-		
+
+}
+
+void ATPSPlayer::ChooseGun(bool bGrenade)
+{
+	// 만약 바꾸기 전이 스나이퍼건이다 그리고 바꾸려는것이 유탄이면
+	if (false == bChooseGrenadeGun && true == bGrenade){
+		// FOV를 90, cui O sui X
+		cameraComp->SetFieldOfView(90);
+		crosshairUI->AddToViewport();
+		sniperUI->RemoveFromParent();
+	}
+
+	bChooseGrenadeGun = bGrenade;
+
+	gunMeshComp->SetVisibility(bGrenade);
+	// Not 비트연산
+	sniperMeshComp->SetVisibility(!bGrenade);
+}
+
+void ATPSPlayer::OnActionGrenade()
+{
+	ChooseGun(GRENADE_GUN);
+}
+
+void ATPSPlayer::OnActionSniper()
+{
+	ChooseGun(SNIPER_GUN);
+}
+
+void ATPSPlayer::OnActionZoomIn()
+{
+	// 만약 유탄이라면 바로 종료
+	if (true == bChooseGrenadeGun)	{
+		return;
+	}
+	// 확대 FOV 30
+	cameraComp->SetFieldOfView(30);
+	// crosshair를 안보이게하고, 확대경을 보이게하고싶다.
+	crosshairUI->RemoveFromParent();
+	sniperUI->AddToViewport();
+}
+
+void ATPSPlayer::OnActionZoomOut()
+{
+	// 만약 유탄이라면 바로 종료
+	if (true == bChooseGrenadeGun) {
+		return;
+	}
+	// 확대 FOV 90
+	cameraComp->SetFieldOfView(90);
+	// crosshair를 보이게하고, 확대경을 안보이게하고싶다.
+	crosshairUI->AddToViewport();
+	sniperUI->RemoveFromParent();
 }
 
