@@ -25,6 +25,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -66,7 +67,9 @@ public:
 	
 	FTimerHandle fireTimerHandle;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool bChooseGrenadeGun;
+	
 	void ChooseGun(bool bGrenade);
 
 	// 위젯공장에서 위젯을 생성하고싶다. Crosshair, Sniper
@@ -88,6 +91,11 @@ public:
 	void OnActionZoomIn();	// 확대 FOV 30
 	void OnActionZoomOut();	// 축소 FOV 90
 
+	// 폭발공장
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* bulletImpactFactory;
 
+	UFUNCTION(BlueprintCallable)
+	void CallByBlueprint();
 };
 

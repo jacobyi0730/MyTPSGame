@@ -7,6 +7,7 @@
 #include <GameFramework/CharacterMovementComponent.h>
 #include "BulletActor.h"
 #include "Blueprint/UserWidget.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
@@ -86,6 +87,8 @@ void ATPSPlayer::BeginPlay()
 	// 2. 스나이퍼건일때 ZoomIn을 하면 cui X, sui O
 	// 3. 스나이퍼건일때 ZoomOut을 하면 cui O, sui X
 	// 4. 기본총을 선택하면 cui O, sui X
+
+
 }
 
 // Called every frame
@@ -164,9 +167,51 @@ void ATPSPlayer::OnActionJump()
 
 void ATPSPlayer::OnActionFirePressed()
 {
-	GetWorldTimerManager().SetTimer(fireTimerHandle, this, &ATPSPlayer::DoFire, fireInterval, true);
+	// 만약 기본총이라면
+	if (bChooseGrenadeGun)
+	{
+		GetWorldTimerManager().SetTimer(fireTimerHandle, this, &ATPSPlayer::DoFire, fireInterval, true);
 
-	DoFire();
+		DoFire();
+	}
+	// 그렇지않다면 (스나이퍼건)
+	else
+	{
+		FHitResult hitInfo;
+		FVector start = cameraComp->GetComponentLocation(); // 카메라의 월드좌표
+		FVector end = start + cameraComp->GetForwardVector() * 100000;
+		FCollisionQueryParams params;
+		params.AddIgnoredActor(this);
+
+		// 바라보고싶다.
+		bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, start, end, ECollisionChannel::ECC_Visibility, params);
+
+		// 만약 부딪힌 것이 있다면
+		if (true == bHit)
+		{
+			// 상호작용을 하고싶다.
+
+			// 부딪힌 곳에 폭발이펙트를 표시하고싶다.
+			FTransform trans(hitInfo.ImpactPoint);
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), bulletImpactFactory, trans);
+
+			auto hitComp = hitInfo.GetComponent();
+			// 부딪힌 물체가 물리작용을 하고있다면
+			if (hitComp && hitComp->IsSimulatingPhysics())
+			{
+				// 힘을 가하고싶다.
+				FVector forceDir = (hitInfo.TraceEnd - hitInfo.TraceStart).GetSafeNormal();
+
+				FVector force = forceDir * 1000000 * hitComp->GetMass();
+
+				hitComp->AddForce(force);
+			}
+		}
+
+
+
+		
+	}
 }
 
 void ATPSPlayer::OnActionFireReleased()
@@ -236,5 +281,10 @@ void ATPSPlayer::OnActionZoomOut()
 	// crosshair를 보이게하고, 확대경을 안보이게하고싶다.
 	crosshairUI->AddToViewport();
 	sniperUI->RemoveFromParent();
+}
+
+void ATPSPlayer::CallByBlueprint()
+{
+
 }
 
