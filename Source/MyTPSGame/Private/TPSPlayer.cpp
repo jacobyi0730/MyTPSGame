@@ -8,6 +8,8 @@
 #include "BulletActor.h"
 #include "Blueprint/UserWidget.h"
 #include <Kismet/GameplayStatics.h>
+#include "Enemy.h"
+#include "EnemyFSM.h"
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
@@ -194,6 +196,17 @@ void ATPSPlayer::OnActionFirePressed()
 			// 부딪힌 곳에 폭발이펙트를 표시하고싶다.
 			FTransform trans(hitInfo.ImpactPoint);
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), bulletImpactFactory, trans);
+
+			// 만약 부딪힌 액터가 Enemy라면
+			auto hitActor = hitInfo.GetActor();
+			AEnemy* enemy = Cast<AEnemy>(hitActor);
+			if (nullptr != enemy)
+			{
+				// Enemy에게 데미지를 주고싶다.
+				UEnemyFSM* fsm = Cast<UEnemyFSM>(enemy->GetDefaultSubobjectByName(TEXT("enemyFSM")));
+
+				fsm->OnDamageProcess(1);
+			}
 
 			auto hitComp = hitInfo.GetComponent();
 			// 부딪힌 물체가 물리작용을 하고있다면
