@@ -97,5 +97,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void CallByBlueprint();
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* fireSound;
 };
 

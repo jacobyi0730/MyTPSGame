@@ -10,6 +10,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "Enemy.h"
 #include "EnemyFSM.h"
+#include "TPSPlayerAnim.h"
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
@@ -49,26 +50,33 @@ ATPSPlayer::ATPSPlayer()
 
 	// 일반총의 컴포넌트를 만들고싶다.
 	gunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("gunMeshComp"));
-	gunMeshComp->SetupAttachment(GetMesh());
+	gunMeshComp->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
 	// 일반총의 에셋을 읽어서 컴포넌트에 넣고싶다.
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempGunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/FPWeapon/Mesh/SK_FPGun.SK_FPGun'"));
 	if (tempGunMesh.Succeeded())
 	{
 		gunMeshComp->SetSkeletalMesh(tempGunMesh.Object);
-		gunMeshComp->SetRelativeLocationAndRotation(FVector(0, 50, 130), FRotator(0, 0, 0));
+		gunMeshComp->SetRelativeLocationAndRotation(FVector(-5.86f, 1.54f, -2.18f), FRotator(10, 100, -10));
 	}
 
 	sniperMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("sniperMeshComp"));
 
-	sniperMeshComp->SetupAttachment(GetMesh());
+	sniperMeshComp->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempSniper(TEXT("/Script/Engine.StaticMesh'/Game/SniperGun/sniper1.sniper1'"));
-
 	if (tempSniper.Succeeded())
 	{
 		sniperMeshComp->SetStaticMesh(tempSniper.Object);
 		sniperMeshComp->SetRelativeLocationAndRotation(FVector(0, 60, 140), FRotator(0, 0, 0));
 		sniperMeshComp->SetRelativeScale3D(FVector(0.15f));
+	}
+
+
+	ConstructorHelpers::FObjectFinder<USoundBase> tempFireSound(TEXT("/Script/Engine.SoundWave'/Game/SniperGun/Rifle.Rifle'"));
+
+	if (tempFireSound.Succeeded())
+	{
+		fireSound = tempFireSound.Object;
 	}
 
 }
@@ -169,6 +177,13 @@ void ATPSPlayer::OnActionJump()
 
 void ATPSPlayer::OnActionFirePressed()
 {
+	// 총쏘는 애니메이션을 재생하고싶다.
+	auto anim = Cast<UTPSPlayerAnim>(GetMesh()->GetAnimInstance());
+	anim->OnFire();
+
+	// 총소리를 내고싶다.
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), fireSound, GetActorLocation(), GetActorRotation());
+	
 	// 만약 기본총이라면
 	if (bChooseGrenadeGun)
 	{
