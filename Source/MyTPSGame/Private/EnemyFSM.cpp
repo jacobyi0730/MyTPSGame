@@ -8,6 +8,8 @@
 #include "../MyTPSGame.h"
 #include <Components/CapsuleComponent.h>
 
+#include "EnemyAnim.h"
+
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
 {
@@ -27,10 +29,10 @@ void UEnemyFSM::BeginPlay()
 
 	// me를 찾고싶다.
 	me = Cast<AEnemy>(GetOwner());
-	
+
 	// 태어날 때 현재 체력을 최대 체력으로 하고싶다.
 	hp = maxHP;
-	
+
 }
 
 
@@ -38,7 +40,12 @@ void UEnemyFSM::BeginPlay()
 void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
+
+	// 내 본체의 EnemyAnim의 state에 내 state를 넣어주고싶다.
+
+	//me->enemyAnim->state = this->state;
+
+
 	switch (state)
 	{
 	case EEnemyState::IDLE:
@@ -61,14 +68,15 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 //  대기, 플레이어를 찾으면 이동으로 전이
 void UEnemyFSM::TickIdle()
-{	
+{
 	// 1. 플레이어를 찾고싶다.
 	target = Cast<ATPSPlayer>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 	// 2. 만약 플레이어를 찾았으면
 	if (nullptr != target)
 	{
 		// 3. 이동으로 전이하고싶다.
-		state = EEnemyState::MOVE;
+		SetState(EEnemyState::MOVE);
+
 	}
 }
 
@@ -77,6 +85,7 @@ void UEnemyFSM::TickIdle()
 // 공격상태로 전이하고싶다.
 void UEnemyFSM::TickMove()
 {
+	
 	// 1. 목적지를 향하는 방향을 만들고
 	FVector dir = target->GetActorLocation() - me->GetActorLocation();
 	// 2. 그 방향으로 이동하고싶다.
@@ -87,7 +96,7 @@ void UEnemyFSM::TickMove()
 	//float dist = FVector::Dist(target->GetActorLocation(), me->GetActorLocation());
 	if (dist <= attakcRange) {
 		// 4. 공격상태로 전이하고싶다.
-		state = EEnemyState::ATTACK;
+		SetState(EEnemyState::ATTACK);
 	}
 }
 
@@ -102,7 +111,7 @@ void UEnemyFSM::TickAttack()
 		bAttackPlay = true;
 		// 3. 공격을 하고 (조건은 공격거리 안에 있는가?)
 		float dist = target->GetDistanceTo(me);
-		if (dist <= attakcRange) 
+		if (dist <= attakcRange)
 		{
 			PRINT_LOG(TEXT("Enemy is Attack"));
 		}
@@ -117,7 +126,7 @@ void UEnemyFSM::TickAttack()
 		if (dist > attakcRange)
 		{
 			// 이동상태로 전이하고싶다.
-			state = EEnemyState::MOVE;
+			SetState(EEnemyState::MOVE);
 		}
 		else { // 공격거리 안에 있으면 계속해서 공격하고싶다.
 			currentTime = 0;
@@ -132,7 +141,7 @@ void UEnemyFSM::TickDamage()
 	currentTime += GetWorld()->GetDeltaSeconds();
 	if (currentTime > 1)
 	{
-		state = EEnemyState::MOVE;
+		SetState(EEnemyState::MOVE);
 		currentTime = 0;
 	}
 }
@@ -161,13 +170,19 @@ void UEnemyFSM::OnDamageProcess(int damageValue)
 	// 체력이 0이되면
 	if (hp <= 0) {
 		// Die 하고 싶다.
-		state = EEnemyState::DIE;
+		SetState(EEnemyState::DIE);
 		me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 	// 그렇지 않다면
 	else {
 		//	Damage 하고 싶다.
-		state = EEnemyState::DAMAGE;
+		SetState(EEnemyState::DAMAGE);
 	}
 }
 
+
+void UEnemyFSM::SetState(EEnemyState next)
+{
+	state = next;
+	me->enemyAnim->state = next;
+}

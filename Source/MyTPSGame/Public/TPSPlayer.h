@@ -44,9 +44,19 @@ public:
 	void OnAxisLookUp(float value);
 	void OnAxisTurnRight(float value);
 	void OnActionJump();
+	
+	float speedRun = 600; // LShift : Run(600)
+	float speedWalk = 400; // None : Walk(400)
+	float speedCrouch = 200; // LCtrl : Crouch(200)
+
+	void OnActionRunPressed();
+	void OnActionRunReleased();
+	void OnActionCrouchPressed();
+	void OnActionCrouchReleased();
+
+
 	void OnActionFirePressed();
 	void OnActionFireReleased();
-
 	void DoFire();
 
 	// 마우스 왼쪽버튼을 누르면 총알공장에서 총알을 만들어서 총구위치에 배치하고싶다.
@@ -100,5 +110,11 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class USoundBase* fireSound;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UCameraShakeBase> camShakeFactory;
+
+	UPROPERTY()
+	class UCameraShakeBase* canShakeInstance;
 };
 

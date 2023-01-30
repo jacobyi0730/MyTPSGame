@@ -28,4 +28,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
 	class UEnemyFSM* enemyFSM;
+
+	UPROPERTY()
+	class UEnemyAnim* enemyAnim;
 };

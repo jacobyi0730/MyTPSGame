@@ -85,6 +85,10 @@ ATPSPlayer::ATPSPlayer()
 void ATPSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// 태어날 때 속력을 speedWalk로 설정하고싶다.
+	GetCharacterMovement()->MaxWalkSpeed = speedWalk;
+
 	// UI를 생성하고싶다.
 	crosshairUI = CreateWidget(GetWorld(), crosshairFactory);
 	sniperUI = CreateWidget(GetWorld(), sniperFactory);
@@ -97,7 +101,6 @@ void ATPSPlayer::BeginPlay()
 	// 2. 스나이퍼건일때 ZoomIn을 하면 cui X, sui O
 	// 3. 스나이퍼건일때 ZoomOut을 하면 cui O, sui X
 	// 4. 기본총을 선택하면 cui O, sui X
-
 
 }
 
@@ -146,6 +149,15 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("Zoom"), IE_Pressed, this, &ATPSPlayer::OnActionZoomIn);
 
 	PlayerInputComponent->BindAction(TEXT("Zoom"), IE_Released, this, &ATPSPlayer::OnActionZoomOut);
+
+
+	PlayerInputComponent->BindAction(TEXT("Run"), IE_Pressed, this, &ATPSPlayer::OnActionRunPressed);
+
+	PlayerInputComponent->BindAction(TEXT("Run"), IE_Released, this, &ATPSPlayer::OnActionRunReleased);
+
+	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Pressed, this, &ATPSPlayer::OnActionCrouchPressed);
+
+	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Released, this, &ATPSPlayer::OnActionCrouchReleased);
 }
 
 void ATPSPlayer::OnAxisHorizontal(float value)
@@ -175,8 +187,38 @@ void ATPSPlayer::OnActionJump()
 	Jump();
 }
 
+void ATPSPlayer::OnActionRunPressed()
+{
+	GetCharacterMovement()->MaxWalkSpeed = speedRun;
+}
+void ATPSPlayer::OnActionRunReleased()
+{
+	GetCharacterMovement()->MaxWalkSpeed = speedWalk;
+}
+void ATPSPlayer::OnActionCrouchPressed()
+{
+	GetCharacterMovement()->MaxWalkSpeed = speedCrouch;
+}
+void ATPSPlayer::OnActionCrouchReleased()
+{
+	GetCharacterMovement()->MaxWalkSpeed = speedWalk;
+}
+
 void ATPSPlayer::OnActionFirePressed()
 {
+	// 카메라를 흔들고싶다.
+	APlayerCameraManager* cameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+	// 만약 이미 흔들고 있었다면
+	// -> 만약 canShakeInstance가 nullptr이 아니다. 그리고 흔드는 중이라면
+	if (nullptr != canShakeInstance && false == canShakeInstance->IsFinished())
+	{
+		// 취소하고
+		cameraManager->StopCameraShake(canShakeInstance);
+	}
+	// 흔들고싶다.
+	canShakeInstance = cameraManager->StartCameraShake(camShakeFactory);
+
+
 	// 총쏘는 애니메이션을 재생하고싶다.
 	auto anim = Cast<UTPSPlayerAnim>(GetMesh()->GetAnimInstance());
 	anim->OnFire();

@@ -57,4 +57,9 @@ public:
 	int hp;
 	int maxHP = 2;
 	void OnDamageProcess(int damageValue); // CallBack 함수, 이벤트 함수
+
+
+	void SetState(EEnemyState next);
 };
+
+
