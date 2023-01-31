@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -39,12 +39,15 @@ public:
 
 	class AEnemy* me;
 
-	// °ø°İ°¡´É°Å¸® -> ÀÌµ¿ÇÏ´Ù°¡ ¸ØÃß´Â Á¶°Ç°ª
+	// ê³µê²©ê°€ëŠ¥ê±°ë¦¬ -> ì´ë™í•˜ë‹¤ê°€ ë©ˆì¶”ëŠ” ì¡°ê±´ê°’
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float attakcRange = 200;
 
 	float currentTime = 0;
 	bool bAttackPlay;
+
+	UPROPERTY(EditAnywhere)
+	float attackDelayTime = 3;
 
 private:
 	void TickIdle();
@@ -56,10 +59,12 @@ private:
 public:
 	int hp;
 	int maxHP = 2;
-	void OnDamageProcess(int damageValue); // CallBack ÇÔ¼ö, ÀÌº¥Æ® ÇÔ¼ö
+	void OnDamageProcess(int damageValue); // CallBack í•¨ìˆ˜, ì´ë²¤íŠ¸ í•¨ìˆ˜
 
 
 	void SetState(EEnemyState next);
+
+	void OnHitEvent();
 };
 
 

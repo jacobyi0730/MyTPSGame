@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -31,4 +31,8 @@ public:
 
 	UPROPERTY()
 	class UEnemyAnim* enemyAnim;
+
+	// 선언과 호출은 C++에서, 구현은 블루프린트에서 하는 함수를 만들고싶다.
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMyDamage(FName sectionName); // Player->Enemy 에게
 };

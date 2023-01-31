@@ -116,5 +116,7 @@ public:
 
 	UPROPERTY()
 	class UCameraShakeBase* canShakeInstance;
+
+	
 };
 

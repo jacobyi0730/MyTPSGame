@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "TPSPlayerAnim.h"
@@ -10,20 +10,20 @@ void UTPSPlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	// OwnerÀÇ Velocity¸¦ °¡Á®¿Í¼­
+	// Ownerì˜ Velocityë¥¼ ê°€ì ¸ì™€ì„œ
 	ATPSPlayer* owner = Cast<ATPSPlayer>(TryGetPawnOwner());
 
 	if (nullptr == owner)
 	{
 		return;
 	}
-	// rightVelocity, forwardVelocity¸¦ ±¸ÇÏ°í½Í´Ù.
-	// VectorÀÇ ³»ÀûÀ» ÀÌ¿ëÇØ¼­ ¹æÇâ°ªÀ» ±¸ÇÏ°í½Í´Ù.
+	// rightVelocity, forwardVelocityë¥¼ êµ¬í•˜ê³ ì‹¶ë‹¤.
+	// Vectorì˜ ë‚´ì ì„ ì´ìš©í•´ì„œ ë°©í–¥ê°’ì„ êµ¬í•˜ê³ ì‹¶ë‹¤.
 	FVector velocity = owner->GetVelocity();
 	rightVelocity = FVector::DotProduct(velocity, owner->GetActorRightVector());
 
 	forwardVelocity = FVector::DotProduct(velocity, owner->GetActorForwardVector());
-		// isInAir¸¦ ±¸ÇÏ°í½Í´Ù.
+		// isInAirë¥¼ êµ¬í•˜ê³ ì‹¶ë‹¤.
 	
 	isInAir = owner->GetCharacterMovement()->IsFalling();
 }
