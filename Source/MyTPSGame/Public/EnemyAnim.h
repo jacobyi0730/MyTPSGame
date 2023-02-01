@@ -25,6 +25,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool bAttackPlay;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnemyDieEnd;
+
 	//UFUNCTION(BlueprintCallable)
 	//void OnHitEvent();
 

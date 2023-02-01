@@ -7,8 +7,8 @@
 #include "TPSPlayer.h"
 #include "../MyTPSGame.h"
 #include <Components/CapsuleComponent.h>
-
 #include "EnemyAnim.h"
+#include "AIController.h"
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -29,6 +29,8 @@ void UEnemyFSM::BeginPlay()
 
 	// me를 찾고싶다.
 	me = Cast<AEnemy>(GetOwner());
+
+	ai = Cast<AAIController>(me->GetController());
 
 	// 태어날 때 현재 체력을 최대 체력으로 하고싶다.
 	hp = maxHP;
@@ -85,11 +87,12 @@ void UEnemyFSM::TickIdle()
 // 공격상태로 전이하고싶다.
 void UEnemyFSM::TickMove()
 {
-	
+
 	// 1. 목적지를 향하는 방향을 만들고
 	FVector dir = target->GetActorLocation() - me->GetActorLocation();
 	// 2. 그 방향으로 이동하고싶다.
-	me->AddMovementInput(dir.GetSafeNormal());
+	ai->MoveToLocation(target->GetActorLocation());
+	
 	// 3. 목적지와의 거리가 공격가능거리라면
 	float dist = dir.Size();
 	//float dist = target->GetDistanceTo(me);
@@ -139,6 +142,12 @@ void UEnemyFSM::TickDamage()
 
 void UEnemyFSM::TickDie()
 {
+	// 만약 넘어지는 애니메이션이 끝나지 않았다면
+	if (false == me->enemyAnim->bEnemyDieEnd)
+	{
+		return;
+	}
+
 	currentTime += GetWorld()->GetDeltaSeconds();
 
 	// P = P0 + vt
@@ -156,18 +165,43 @@ void UEnemyFSM::TickDie()
 // 플레이어에게 맞았다.
 void UEnemyFSM::OnDamageProcess(int damageValue)
 {
+	if (ai)
+	{
+		ai->StopMovement();
+	}
 	// 체력을 소모하고
 	hp -= damageValue;
 	// 체력이 0이되면
-	if (hp <= 0) {
+	if (hp <= 0) 
+	{
 		// Die 하고 싶다.
 		SetState(EEnemyState::DIE);
+		me->enemyAnim->bEnemyDieEnd = false;
+		// 몽타주의 Die섹션을 플레이 시키고싶다.
+		me->OnMyDamage(TEXT("Die"));
+
 		me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 	// 그렇지 않다면
-	else {
+	else 
+	{
 		//	Damage 하고 싶다.
 		SetState(EEnemyState::DAMAGE);
+
+		int index = FMath::RandRange(0, 1);
+		FString sectionName =
+			FString::Printf(TEXT("Damage%d"), index);
+
+		me->OnMyDamage(FName(*sectionName));
+		// Ctrl + K + C  / Ctrl + K + U
+		//if (FMath::RandRange(0, 100) > 50)
+		//{
+		//	me->OnMyDamage(TEXT("Damage1"));
+		//}
+		//else
+		//{
+		//	me->OnMyDamage(TEXT("Damage0"));
+		//}
 	}
 }
 
@@ -176,6 +210,7 @@ void UEnemyFSM::SetState(EEnemyState next)
 {
 	state = next;
 	me->enemyAnim->state = next;
+	currentTime = 0;
 }
 
 void UEnemyFSM::OnHitEvent()

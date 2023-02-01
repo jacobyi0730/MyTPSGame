@@ -49,6 +49,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	float attackDelayTime = 3;
 
+
 private:
 	void TickIdle();
 	void TickMove();
@@ -65,6 +66,8 @@ public:
 	void SetState(EEnemyState next);
 
 	void OnHitEvent();
+
+	class AAIController* ai;
 };
 
 

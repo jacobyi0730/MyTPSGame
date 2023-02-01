@@ -264,19 +264,7 @@ void ATPSPlayer::OnActionFirePressed()
 
 				fsm->OnDamageProcess(1);
 
-				int index = FMath::RandRange(0, 1);
-				FString sectionName = 
-					FString::Printf(TEXT("Damage%d"), index);
-
-				enemy->OnMyDamage(FName(*sectionName));
-				/*if (FMath::RandRange(0, 100) > 50)
-				{
-					enemy->OnMyDamage(TEXT("Damage1"));
-				}
-				else
-				{
-					enemy->OnMyDamage(TEXT("Damage0"));
-				}*/
+				
 			}
 
 			auto hitComp = hitInfo.GetComponent();
