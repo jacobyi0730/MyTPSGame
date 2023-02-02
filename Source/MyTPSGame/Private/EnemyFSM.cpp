@@ -34,7 +34,7 @@ void UEnemyFSM::BeginPlay()
 	ai = Cast<AAIController>(me->GetController());
 
 	// 태어날 때 현재 체력을 최대 체력으로 하고싶다.
-	hp = maxHP;
+	me->hp = me->maxHP;
 
 	// 태어날 때 랜덤 목적지를 정해놓고싶다.
 	UpdateRandomLocation(randLocationRadius, randomLocation);
@@ -113,7 +113,9 @@ void UEnemyFSM::TickMove()
 	{
 		// C. 그렇지 않다면 무작위로 위치를 하나 선정해서 그곳으로 가고싶다.
 		auto r = ai->MoveToLocation(randomLocation);
-		if (r == EPathFollowingRequestResult::AlreadyAtGoal)
+		if (r == EPathFollowingRequestResult::AlreadyAtGoal
+			||
+			r == EPathFollowingRequestResult::Failed)
 		{
 			// D.    만약 위치에 도착했다면 다시 무작위로 위치를 재선정하고싶다.
 			UpdateRandomLocation(randLocationRadius, randomLocation);
@@ -199,9 +201,9 @@ void UEnemyFSM::OnDamageProcess(int damageValue)
 		ai->StopMovement();
 	}
 	// 체력을 소모하고
-	hp -= damageValue;
+	me->hp -= damageValue;
 	// 체력이 0이되면
-	if (hp <= 0) 
+	if (me->hp <= 0)
 	{
 		// Die 하고 싶다.
 		SetState(EEnemyState::DIE);

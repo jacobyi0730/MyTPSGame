@@ -35,4 +35,11 @@ public:
 	// 선언과 호출은 C++에서, 구현은 블루프린트에서 하는 함수를 만들고싶다.
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnMyDamage(FName sectionName); // Player->Enemy 에게
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int hp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int maxHP = 2;
+
 };
