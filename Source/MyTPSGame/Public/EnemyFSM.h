@@ -68,6 +68,13 @@ public:
 	void OnHitEvent();
 
 	class AAIController* ai;
+
+	UPROPERTY(EditAnywhere)
+	float randLocationRadius = 500;
+
+	FVector randomLocation;
+
+	bool UpdateRandomLocation(float radius, FVector& outLocation);
 };
 
 

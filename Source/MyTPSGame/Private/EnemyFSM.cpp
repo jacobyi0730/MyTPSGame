@@ -9,6 +9,7 @@
 #include <Components/CapsuleComponent.h>
 #include "EnemyAnim.h"
 #include "AIController.h"
+#include "NavigationSystem.h"
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -34,6 +35,9 @@ void UEnemyFSM::BeginPlay()
 
 	// 태어날 때 현재 체력을 최대 체력으로 하고싶다.
 	hp = maxHP;
+
+	// 태어날 때 랜덤 목적지를 정해놓고싶다.
+	UpdateRandomLocation(randLocationRadius, randomLocation);
 
 }
 
@@ -87,11 +91,36 @@ void UEnemyFSM::TickIdle()
 // 공격상태로 전이하고싶다.
 void UEnemyFSM::TickMove()
 {
-
 	// 1. 목적지를 향하는 방향을 만들고
 	FVector dir = target->GetActorLocation() - me->GetActorLocation();
-	// 2. 그 방향으로 이동하고싶다.
-	ai->MoveToLocation(target->GetActorLocation());
+
+	// A. 내가 갈 수 있는 길위에 target이 있는가?
+	UNavigationSystemV1* ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
+
+	FPathFindingQuery query;
+	FAIMoveRequest requst;
+	requst.SetGoalLocation(target->GetActorLocation());
+	requst.SetAcceptanceRadius(5);
+	ai->BuildPathfindingQuery(requst, query);
+
+	FPathFindingResult result = ns->FindPathSync(query);
+	if (result.Result == ENavigationQueryResult::Success)
+	{
+		// B. 갈 수 있다면 target쪽으로 이동
+		ai->MoveToLocation(target->GetActorLocation());
+	}
+	else
+	{
+		// C. 그렇지 않다면 무작위로 위치를 하나 선정해서 그곳으로 가고싶다.
+		auto r = ai->MoveToLocation(randomLocation);
+		if (r == EPathFollowingRequestResult::AlreadyAtGoal)
+		{
+			// D.    만약 위치에 도착했다면 다시 무작위로 위치를 재선정하고싶다.
+			UpdateRandomLocation(randLocationRadius, randomLocation);
+		}
+		
+	}
+
 	
 	// 3. 목적지와의 거리가 공격가능거리라면
 	float dist = dir.Size();
@@ -223,4 +252,18 @@ void UEnemyFSM::OnHitEvent()
 	{
 		PRINT_LOG(TEXT("Enemy is Attack"));
 	}
+}
+
+bool UEnemyFSM::UpdateRandomLocation(float radius, FVector& outLocation)
+{
+	UNavigationSystemV1* ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
+
+	FNavLocation navLoc;
+	bool result = ns->GetRandomReachablePointInRadius(me->GetActorLocation(), radius, navLoc);
+	if (result)
+	{
+		outLocation = navLoc.Location;
+	}
+
+	return result;
 }
