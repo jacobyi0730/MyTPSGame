@@ -97,10 +97,8 @@ void ATPSPlayer::BeginPlay()
 
 	ChooseGun(GRENADE_GUN);
 
-	// 1. 태어날 때 cui를 보이게하고싶다.
-	// 2. 스나이퍼건일때 ZoomIn을 하면 cui X, sui O
-	// 3. 스나이퍼건일때 ZoomOut을 하면 cui O, sui X
-	// 4. 기본총을 선택하면 cui O, sui X
+	gunAmmo = maxGunAmmo;
+	sniperAmmo = maxSniperAmmo;
 
 }
 
@@ -158,6 +156,18 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Pressed, this, &ATPSPlayer::OnActionCrouchPressed);
 
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Released, this, &ATPSPlayer::OnActionCrouchReleased);
+
+	PlayerInputComponent->BindAction(TEXT("Reload"), IE_Pressed, this, &ATPSPlayer::OnActionReload);
+}
+
+void ATPSPlayer::OnMyGunReload()
+{
+	gunAmmo = maxGunAmmo;
+}
+
+void ATPSPlayer::OnMySniperReload()
+{
+	sniperAmmo = maxSniperAmmo;
 }
 
 void ATPSPlayer::OnAxisHorizontal(float value)
@@ -206,6 +216,21 @@ void ATPSPlayer::OnActionCrouchReleased()
 
 void ATPSPlayer::OnActionFirePressed()
 {
+	// 총을 쏠때 총알이 남아있는지 검증하고싶다.
+	// 만약 남아있다면 1발 차감하고싶다.
+	// 그렇지 않으면 총을 쏘지 않겠다...
+	if (bChooseGrenadeGun)
+	{
+		if (gunAmmo > 0) { gunAmmo--; }
+		else { return; }
+	}
+	else
+	{
+		if (sniperAmmo > 0) { sniperAmmo--; }
+		else { return; }
+	}
+
+
 	// 카메라를 흔들고싶다.
 	APlayerCameraManager* cameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
 	// 만약 이미 흔들고 있었다면
@@ -221,11 +246,11 @@ void ATPSPlayer::OnActionFirePressed()
 
 	// 총쏘는 애니메이션을 재생하고싶다.
 	auto anim = Cast<UTPSPlayerAnim>(GetMesh()->GetAnimInstance());
-	anim->OnFire();
+	anim->OnFire(TEXT("Default"));
 
 	// 총소리를 내고싶다.
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), fireSound, GetActorLocation(), GetActorRotation());
-	
+
 	// 만약 기본총이라면
 	if (bChooseGrenadeGun)
 	{
@@ -264,7 +289,7 @@ void ATPSPlayer::OnActionFirePressed()
 
 				fsm->OnDamageProcess(1);
 
-				
+
 			}
 
 			auto hitComp = hitInfo.GetComponent();
@@ -282,7 +307,7 @@ void ATPSPlayer::OnActionFirePressed()
 
 
 
-		
+
 	}
 }
 
@@ -305,7 +330,7 @@ void ATPSPlayer::DoFire()
 void ATPSPlayer::ChooseGun(bool bGrenade)
 {
 	// 만약 바꾸기 전이 스나이퍼건이다 그리고 바꾸려는것이 유탄이면
-	if (false == bChooseGrenadeGun && true == bGrenade){
+	if (false == bChooseGrenadeGun && true == bGrenade) {
 		// FOV를 90, cui O sui X
 		cameraComp->SetFieldOfView(90);
 		crosshairUI->AddToViewport();
@@ -332,7 +357,7 @@ void ATPSPlayer::OnActionSniper()
 void ATPSPlayer::OnActionZoomIn()
 {
 	// 만약 유탄이라면 바로 종료
-	if (true == bChooseGrenadeGun)	{
+	if (true == bChooseGrenadeGun) {
 		return;
 	}
 	// 확대 FOV 30
@@ -358,5 +383,18 @@ void ATPSPlayer::OnActionZoomOut()
 void ATPSPlayer::CallByBlueprint()
 {
 
+}
+
+void ATPSPlayer::OnActionReload()
+{
+	auto anim = Cast<UTPSPlayerAnim>(GetMesh()->GetAnimInstance());
+	if (bChooseGrenadeGun)
+	{
+		anim->OnFire(TEXT("GunReload"));
+	}
+	else
+	{
+		anim->OnFire(TEXT("SniperReload"));
+	}
 }
 

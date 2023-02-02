@@ -32,6 +32,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void OnMyGunReload();
+	void OnMySniperReload();
+
 	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* springArmComp; 
 
@@ -117,6 +120,19 @@ public:
 	UPROPERTY()
 	class UCameraShakeBase* canShakeInstance;
 
-	
+	// 탄창, 리로드 등등..
+
+	void OnActionReload();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int maxGunAmmo = 20;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int gunAmmo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int maxSniperAmmo = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int sniperAmmo;
+
 };
 
