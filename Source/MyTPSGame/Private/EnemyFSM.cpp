@@ -10,6 +10,7 @@
 #include "EnemyAnim.h"
 #include "AIController.h"
 #include "NavigationSystem.h"
+#include "PathManager.h"
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -27,6 +28,7 @@ void UEnemyFSM::BeginPlay()
 	Super::BeginPlay();
 
 	state = EEnemyState::IDLE; // 명시적, 암시적
+	moveSubState = EEnemyMoveSubState::PATROL;
 
 	// me를 찾고싶다.
 	me = Cast<AEnemy>(GetOwner());
@@ -38,6 +40,9 @@ void UEnemyFSM::BeginPlay()
 
 	// 태어날 때 랜덤 목적지를 정해놓고싶다.
 	UpdateRandomLocation(randLocationRadius, randomLocation);
+
+	// 레벨에 존재하는 PathManager를 찾고싶다.
+	pathManager = Cast<APathManager>(UGameplayStatics::GetActorOfClass(GetWorld(), APathManager::StaticClass()));
 
 }
 
@@ -86,14 +91,8 @@ void UEnemyFSM::TickIdle()
 	}
 }
 
-// 목적지를 향해서 이동하고싶다.
-// 목적지와의 거리가 공격가능거리라면
-// 공격상태로 전이하고싶다.
-void UEnemyFSM::TickMove()
+void UEnemyFSM::TickMoveOldMove()
 {
-	// 1. 목적지를 향하는 방향을 만들고
-	FVector dir = target->GetActorLocation() - me->GetActorLocation();
-
 	// A. 내가 갈 수 있는 길위에 target이 있는가?
 	UNavigationSystemV1* ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
 
@@ -120,9 +119,73 @@ void UEnemyFSM::TickMove()
 			// D.    만약 위치에 도착했다면 다시 무작위로 위치를 재선정하고싶다.
 			UpdateRandomLocation(randLocationRadius, randomLocation);
 		}
-		
+
+	}
+}
+
+// 순찰할 위치를 순서대로 이동하고싶다.
+void UEnemyFSM::TickPatrol()
+{
+	FVector patrolTarget = pathManager->waypoints[wayIndex]->GetActorLocation();
+
+	auto result = ai->MoveToLocation(patrolTarget);
+	// 만약 순찰위치에 도착했다면
+	if (result == EPathFollowingRequestResult::AlreadyAtGoal
+		||
+		result == EPathFollowingRequestResult::Failed)
+	{
+		// 순찰할위치를 다음위치로 갱신하고싶다.
+		// 순방향
+		wayIndex++;
+		// wayIndex의 값이 pathManager->waypoints의 크기 이상이면
+		if (wayIndex >= pathManager->waypoints.Num())
+		{
+			// wayIndex의 값을 0으로 하고싶다.
+			wayIndex = 0;
+		}
+
+		//int arrayLength = pathManager->waypoints.Num();
+
+		// 순방향
+		//wayIndex = (wayIndex + 1) % arrayLength;
+		// 역방향
+		//wayIndex = (wayIndex + arrayLength - 1) % arrayLength;
+
+		// 역방향
+		//wayIndex--;
+		//if (wayIndex < 0)
+		//{
+		//	wayIndex = pathManager->waypoints.Num() - 1;
+		//}
+	}
+}
+
+void UEnemyFSM::TickChase()
+{
+}
+
+// 목적지를 향해서 이동하고싶다.
+// 목적지와의 거리가 공격가능거리라면
+// 공격상태로 전이하고싶다.
+void UEnemyFSM::TickMove()
+{
+	switch (moveSubState)
+	{
+	case EEnemyMoveSubState::PATROL:
+		TickPatrol();
+		break;
+	case EEnemyMoveSubState::CHASE:
+		TickChase();
+		break;
+	case EEnemyMoveSubState::OLD_MOVE: 
+		TickMoveOldMove();
+		break;
 	}
 
+
+
+	// 1. 목적지를 향하는 방향을 만들고
+	FVector dir = target->GetActorLocation() - me->GetActorLocation();
 	
 	// 3. 목적지와의 거리가 공격가능거리라면
 	float dist = dir.Size();
