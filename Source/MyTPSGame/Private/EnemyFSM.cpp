@@ -134,6 +134,9 @@ void UEnemyFSM::TickPatrol()
 		||
 		result == EPathFollowingRequestResult::Failed)
 	{
+
+		//wayIndex = FMath::RandRange(0, pathManager->waypoints.Num() - 1);
+
 		// 순찰할위치를 다음위치로 갱신하고싶다.
 		// 순방향
 		wayIndex++;
@@ -158,10 +161,36 @@ void UEnemyFSM::TickPatrol()
 		//	wayIndex = pathManager->waypoints.Num() - 1;
 		//}
 	}
+
+	// target과의 거리를 측정해서
+	float dist = me->GetDistanceTo(target);
+	// 만약 타겟이 감지거리(detectDistance) 안에 들어왔다면
+	if (dist < detectDistance)
+	{
+		// Chase상태로 전이하고싶다.
+		moveSubState = EEnemyMoveSubState::CHASE;
+	}
 }
 
 void UEnemyFSM::TickChase()
 {
+	// 목적지를 향해서 이동하고싶다.
+	ai->MoveToLocation(target->GetActorLocation());
+
+	// 1. 목적지를 향하는 방향을 만들고
+	FVector dir = target->GetActorLocation() - me->GetActorLocation();
+
+	// 3. 목적지와의 거리를 재고
+	float dist = dir.Size();
+	// 만약  공격가능거리라면
+	if (dist <= attakcRange) {
+		// 4. 공격상태로 전이하고싶다.
+		SetState(EEnemyState::ATTACK);
+	}
+	else if (dist > abandonDistance)// 그렇지 않고 포기거리보다 멀어졌다면
+	{
+		moveSubState = EEnemyMoveSubState::PATROL;
+	}
 }
 
 // 목적지를 향해서 이동하고싶다.
@@ -184,17 +213,7 @@ void UEnemyFSM::TickMove()
 
 
 
-	// 1. 목적지를 향하는 방향을 만들고
-	FVector dir = target->GetActorLocation() - me->GetActorLocation();
-	
-	// 3. 목적지와의 거리가 공격가능거리라면
-	float dist = dir.Size();
-	//float dist = target->GetDistanceTo(me);
-	//float dist = FVector::Dist(target->GetActorLocation(), me->GetActorLocation());
-	if (dist <= attakcRange) {
-		// 4. 공격상태로 전이하고싶다.
-		SetState(EEnemyState::ATTACK);
-	}
+
 }
 
 // 공격 타이밍 

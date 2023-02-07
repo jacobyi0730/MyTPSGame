@@ -90,12 +90,19 @@ public:
 
 	bool UpdateRandomLocation(float radius, FVector& outLocation);
 
-
 	// PathManager를 알고싶다.
 	UPROPERTY()
 	class APathManager* pathManager;
 	// PathManager의 waypoints를 이용해서 순찰할 목적지를 정하고싶다.
 	int wayIndex;
+
+	// Patrol에서 감지거리다..
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float detectDistance = 500;
+
+	// Chase에서 추적포기거리 : 감지거리보다 커야한다.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float abandonDistance = 800;
 
 };
 
