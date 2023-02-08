@@ -11,6 +11,7 @@
 #include "AIController.h"
 #include "NavigationSystem.h"
 #include "PathManager.h"
+#include "MyTPSGame/MyTPSGameGameModeBase.h"
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -287,6 +288,7 @@ void UEnemyFSM::OnDamageProcess(int damageValue)
 	// 체력이 0이되면
 	if (me->hp <= 0)
 	{
+		me->hp = 0;
 		// Die 하고 싶다.
 		SetState(EEnemyState::DIE);
 		me->enemyAnim->bEnemyDieEnd = false;
@@ -294,6 +296,9 @@ void UEnemyFSM::OnDamageProcess(int damageValue)
 		me->OnMyDamage(TEXT("Die"));
 
 		me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		// 게임모드의 AddExp함수를 호출하고싶다. 1점
+		Cast<AMyTPSGameGameModeBase>(GetWorld()->GetAuthGameMode())->AddExp(1);
 	}
 	// 그렇지 않다면
 	else 

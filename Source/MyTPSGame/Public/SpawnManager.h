@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -23,23 +23,35 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// ·£´ı½Ã°£¸¶´Ù ÀûÀ» ·£´ıÀ§Ä¡¿¡ »ı¼ºÇÏ°í½Í´Ù.
-	// - ·£´ıÀ§Ä¡¸¦ À§ÇÑ À§Ä¡¸ñ·Ï
+	// ëœë¤ì‹œê°„ë§ˆë‹¤ ì ì„ ëœë¤ìœ„ì¹˜ì— ìƒì„±í•˜ê³ ì‹¶ë‹¤.
+	// - ëœë¤ìœ„ì¹˜ë¥¼ ìœ„í•œ ìœ„ì¹˜ëª©ë¡
 	UPROPERTY(EditAnywhere)
 	TArray<AActor*> spawnList;
-	// ÀÌÀü¿¡ ¼±ÅÃÇÑ ·£´ı À§Ä¡
+	// ì´ì „ì— ì„ íƒí•œ ëœë¤ ìœ„ì¹˜
 	int prevRandIndex = -1;
-	// - ÃÖ¼Ò, ÃÖ´ë½Ã°£
+	// - ìµœì†Œ, ìµœëŒ€ì‹œê°„
 	UPROPERTY(EditAnywhere)
 	float minTime = 1;
 	UPROPERTY(EditAnywhere)
 	float maxTime = 2;
-	// »ı¼ºÇÒ½Ã°£
+	// ìƒì„±í• ì‹œê°„
 	float createTime;
-	// - Å¸ÀÌ¸ÓÇÚµé
+	// - íƒ€ì´ë¨¸í•¸ë“¤
 	FTimerHandle timerHandleMakeEnemy;
-	// - Àû°øÀå -> ¾ğ¸®¾ó°´Ã¼
+
+	// - ì ê³µì¥ -> ì–¸ë¦¬ì–¼ê°ì²´
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AEnemy> enemyFactory;
+	TSubclassOf<class AEnemy> enemyFactory1;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AEnemy> enemyFactory2;
+
+
 	void MakeEnemy();
+
+	// ë§Œë“  ê°¯ìˆ˜
+	int makeCount;
+	// ëª©í‘œ ê°¯ìˆ˜
+	int makeTargetCount;
+
 };

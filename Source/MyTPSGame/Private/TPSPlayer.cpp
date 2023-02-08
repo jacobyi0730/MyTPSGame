@@ -207,11 +207,13 @@ void ATPSPlayer::OnActionRunReleased()
 }
 void ATPSPlayer::OnActionCrouchPressed()
 {
-	GetCharacterMovement()->MaxWalkSpeed = speedCrouch;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = speedCrouch;
+	Crouch();
 }
 void ATPSPlayer::OnActionCrouchReleased()
 {
-	GetCharacterMovement()->MaxWalkSpeed = speedWalk;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = speedWalk;
+	UnCrouch();
 }
 
 void ATPSPlayer::OnActionFirePressed()

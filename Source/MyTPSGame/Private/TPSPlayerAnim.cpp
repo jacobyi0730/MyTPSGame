@@ -26,6 +26,8 @@ void UTPSPlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 		// isInAir를 구하고싶다.
 	
 	isInAir = owner->GetCharacterMovement()->IsFalling();
+
+	isCrouching = owner->GetCharacterMovement()->IsCrouching();
 }
 
 void UTPSPlayerAnim::OnFire(FName sectionName)
