@@ -35,8 +35,4 @@ public:
 	void LevelUp();
 	void AddExp(int amount);
 	void LevelUpProcess();
-
-
-
-	
 };

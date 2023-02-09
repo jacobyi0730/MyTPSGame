@@ -4,6 +4,7 @@
 #include "TPSPlayerAnim.h"
 
 #include "TPSPlayer.h"
+#include "TPSPlayerFireComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 void UTPSPlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
@@ -40,11 +41,11 @@ void UTPSPlayerAnim::OnFire(FName sectionName)
 void UTPSPlayerAnim::OnGunReload()
 {
 	ATPSPlayer* owner = Cast<ATPSPlayer>(TryGetPawnOwner());
-	owner->OnMyGunReload();
+	owner->fireComp->OnMyGunReload();
 }
 
 void UTPSPlayerAnim::OnSniperReload()
 {
 	ATPSPlayer* owner = Cast<ATPSPlayer>(TryGetPawnOwner());
-	owner->OnMySniperReload();
+	owner->fireComp->OnMySniperReload();
 }
