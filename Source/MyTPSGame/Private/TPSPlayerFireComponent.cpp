@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "TPSPlayerFireComponent.h"
@@ -32,12 +32,10 @@ void UTPSPlayerFireComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	me = Cast<ATPSPlayer>(GetOwner());
-
-	// UI¸¦ »ı¼ºÇÏ°í½Í´Ù.
+	// UIë¥¼ ìƒì„±í•˜ê³ ì‹¶ë‹¤.
 	crosshairUI = CreateWidget(GetWorld(), crosshairFactory);
 	sniperUI = CreateWidget(GetWorld(), sniperFactory);
-	// crosshairUI¸¦ È­¸é¿¡ Ç¥½ÃÇÏ°í½Í´Ù.
+	// crosshairUIë¥¼ í™”ë©´ì— í‘œì‹œí•˜ê³ ì‹¶ë‹¤.
 	crosshairUI->AddToViewport();
 
 	ChooseGun(GRENADE_GUN);
@@ -87,9 +85,9 @@ void UTPSPlayerFireComponent::OnMySniperReload()
 
 void UTPSPlayerFireComponent::OnActionFirePressed()
 {
-	// ÃÑÀ» ½ò¶§ ÃÑ¾ËÀÌ ³²¾ÆÀÖ´ÂÁö °ËÁõÇÏ°í½Í´Ù.
-	// ¸¸¾à ³²¾ÆÀÖ´Ù¸é 1¹ß Â÷°¨ÇÏ°í½Í´Ù.
-	// ±×·¸Áö ¾ÊÀ¸¸é ÃÑÀ» ½îÁö ¾Ê°Ú´Ù...
+	// ì´ì„ ì ë•Œ ì´ì•Œì´ ë‚¨ì•„ìˆëŠ”ì§€ ê²€ì¦í•˜ê³ ì‹¶ë‹¤.
+	// ë§Œì•½ ë‚¨ì•„ìˆë‹¤ë©´ 1ë°œ ì°¨ê°í•˜ê³ ì‹¶ë‹¤.
+	// ê·¸ë ‡ì§€ ì•Šìœ¼ë©´ ì´ì„ ì˜ì§€ ì•Šê² ë‹¤...
 	if (bChooseGrenadeGun)
 	{
 		if (gunAmmo > 0) { gunAmmo--; }
@@ -102,60 +100,60 @@ void UTPSPlayerFireComponent::OnActionFirePressed()
 	}
 
 
-	// Ä«¸Ş¶ó¸¦ Èçµé°í½Í´Ù.
+	// ì¹´ë©”ë¼ë¥¼ í”ë“¤ê³ ì‹¶ë‹¤.
 	APlayerCameraManager* cameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
-	// ¸¸¾à ÀÌ¹Ì Èçµé°í ÀÖ¾ú´Ù¸é
-	// -> ¸¸¾à canShakeInstance°¡ nullptrÀÌ ¾Æ´Ï´Ù. ±×¸®°í Èçµå´Â ÁßÀÌ¶ó¸é
+	// ë§Œì•½ ì´ë¯¸ í”ë“¤ê³  ìˆì—ˆë‹¤ë©´
+	// -> ë§Œì•½ canShakeInstanceê°€ nullptrì´ ì•„ë‹ˆë‹¤. ê·¸ë¦¬ê³  í”ë“œëŠ” ì¤‘ì´ë¼ë©´
 	if (nullptr != canShakeInstance && false == canShakeInstance->IsFinished())
 	{
-		// Ãë¼ÒÇÏ°í
+		// ì·¨ì†Œí•˜ê³ 
 		cameraManager->StopCameraShake(canShakeInstance);
 	}
-	// Èçµé°í½Í´Ù.
+	// í”ë“¤ê³ ì‹¶ë‹¤.
 	canShakeInstance = cameraManager->StartCameraShake(camShakeFactory);
 
 
-	// ÃÑ½î´Â ¾Ö´Ï¸ŞÀÌ¼ÇÀ» Àç»ıÇÏ°í½Í´Ù.
+	// ì´ì˜ëŠ” ì• ë‹ˆë©”ì´ì…˜ì„ ì¬ìƒí•˜ê³ ì‹¶ë‹¤.
 	auto anim = Cast<UTPSPlayerAnim>(me->GetMesh()->GetAnimInstance());
 	anim->OnFire(TEXT("Default"));
 
-	// ÃÑ¼Ò¸®¸¦ ³»°í½Í´Ù.
+	// ì´ì†Œë¦¬ë¥¼ ë‚´ê³ ì‹¶ë‹¤.
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), fireSound, me->GetActorLocation(), me->GetActorRotation());
 
-	// ¸¸¾à ±âº»ÃÑÀÌ¶ó¸é
+	// ë§Œì•½ ê¸°ë³¸ì´ì´ë¼ë©´
 	if (bChooseGrenadeGun)
 	{
 		me->GetWorldTimerManager().SetTimer(fireTimerHandle, this, &UTPSPlayerFireComponent::DoFire, fireInterval, true);
 
 		DoFire();
 	}
-	// ±×·¸Áö¾Ê´Ù¸é (½º³ªÀÌÆÛ°Ç)
+	// ê·¸ë ‡ì§€ì•Šë‹¤ë©´ (ìŠ¤ë‚˜ì´í¼ê±´)
 	else
 	{
 		FHitResult hitInfo;
-		FVector start = me->cameraComp->GetComponentLocation(); // Ä«¸Ş¶óÀÇ ¿ùµåÁÂÇ¥
+		FVector start = me->cameraComp->GetComponentLocation(); // ì¹´ë©”ë¼ì˜ ì›”ë“œì¢Œí‘œ
 		FVector end = start + me->cameraComp->GetForwardVector() * 100000;
 		FCollisionQueryParams params;
 		params.AddIgnoredActor(me);
 
-		// ¹Ù¶óº¸°í½Í´Ù.
+		// ë°”ë¼ë³´ê³ ì‹¶ë‹¤.
 		bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, start, end, ECollisionChannel::ECC_Visibility, params);
 
-		// ¸¸¾à ºÎµúÈù °ÍÀÌ ÀÖ´Ù¸é
+		// ë§Œì•½ ë¶€ë”ªíŒ ê²ƒì´ ìˆë‹¤ë©´
 		if (true == bHit)
 		{
-			// »óÈ£ÀÛ¿ëÀ» ÇÏ°í½Í´Ù.
+			// ìƒí˜¸ì‘ìš©ì„ í•˜ê³ ì‹¶ë‹¤.
 
-			// ºÎµúÈù °÷¿¡ Æø¹ßÀÌÆåÆ®¸¦ Ç¥½ÃÇÏ°í½Í´Ù.
+			// ë¶€ë”ªíŒ ê³³ì— í­ë°œì´í™íŠ¸ë¥¼ í‘œì‹œí•˜ê³ ì‹¶ë‹¤.
 			FTransform trans(hitInfo.ImpactPoint);
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), bulletImpactFactory, trans);
 
-			// ¸¸¾à ºÎµúÈù ¾×ÅÍ°¡ Enemy¶ó¸é
+			// ë§Œì•½ ë¶€ë”ªíŒ ì•¡í„°ê°€ Enemyë¼ë©´
 			auto hitActor = hitInfo.GetActor();
 			AEnemy* enemy = Cast<AEnemy>(hitActor);
 			if (nullptr != enemy)
 			{
-				// Enemy¿¡°Ô µ¥¹ÌÁö¸¦ ÁÖ°í½Í´Ù.
+				// Enemyì—ê²Œ ë°ë¯¸ì§€ë¥¼ ì£¼ê³ ì‹¶ë‹¤.
 				UEnemyFSM* fsm = Cast<UEnemyFSM>(enemy->GetDefaultSubobjectByName(TEXT("enemyFSM")));
 
 				fsm->OnDamageProcess(1);
@@ -164,10 +162,10 @@ void UTPSPlayerFireComponent::OnActionFirePressed()
 			}
 
 			auto hitComp = hitInfo.GetComponent();
-			// ºÎµúÈù ¹°Ã¼°¡ ¹°¸®ÀÛ¿ëÀ» ÇÏ°íÀÖ´Ù¸é
+			// ë¶€ë”ªíŒ ë¬¼ì²´ê°€ ë¬¼ë¦¬ì‘ìš©ì„ í•˜ê³ ìˆë‹¤ë©´
 			if (hitComp && hitComp->IsSimulatingPhysics())
 			{
-				// ÈûÀ» °¡ÇÏ°í½Í´Ù.
+				// í˜ì„ ê°€í•˜ê³ ì‹¶ë‹¤.
 				FVector forceDir = (hitInfo.TraceEnd - hitInfo.TraceStart).GetSafeNormal();
 
 				FVector force = forceDir * 1000000 * hitComp->GetMass();
@@ -189,7 +187,7 @@ void UTPSPlayerFireComponent::OnActionFireReleased()
 
 void UTPSPlayerFireComponent::DoFire()
 {
-	// ÇÃ·¹ÀÌ¾î 1M¾Õ
+	// í”Œë ˆì´ì–´ 1Mì•
 
 	FTransform t = me->gunMeshComp->GetSocketTransform(TEXT("FirePosition"));
 	//t.SetRotation(FQuat(GetControlRotation()));
@@ -200,9 +198,9 @@ void UTPSPlayerFireComponent::DoFire()
 
 void UTPSPlayerFireComponent::ChooseGun(bool bGrenade)
 {
-	// ¸¸¾à ¹Ù²Ù±â ÀüÀÌ ½º³ªÀÌÆÛ°ÇÀÌ´Ù ±×¸®°í ¹Ù²Ù·Á´Â°ÍÀÌ À¯ÅºÀÌ¸é
+	// ë§Œì•½ ë°”ê¾¸ê¸° ì „ì´ ìŠ¤ë‚˜ì´í¼ê±´ì´ë‹¤ ê·¸ë¦¬ê³  ë°”ê¾¸ë ¤ëŠ”ê²ƒì´ ìœ íƒ„ì´ë©´
 	if (false == bChooseGrenadeGun && true == bGrenade) {
-		// FOV¸¦ 90, cui O sui X
+		// FOVë¥¼ 90, cui O sui X
 		me->cameraComp->SetFieldOfView(90);
 		crosshairUI->AddToViewport();
 		sniperUI->RemoveFromParent();
@@ -211,7 +209,7 @@ void UTPSPlayerFireComponent::ChooseGun(bool bGrenade)
 	bChooseGrenadeGun = bGrenade;
 
 	me->gunMeshComp->SetVisibility(bGrenade);
-	// Not ºñÆ®¿¬»ê
+	// Not ë¹„íŠ¸ì—°ì‚°
 	me->sniperMeshComp->SetVisibility(!bGrenade);
 }
 
@@ -227,26 +225,26 @@ void UTPSPlayerFireComponent::OnActionSniper()
 
 void UTPSPlayerFireComponent::OnActionZoomIn()
 {
-	// ¸¸¾à À¯ÅºÀÌ¶ó¸é ¹Ù·Î Á¾·á
+	// ë§Œì•½ ìœ íƒ„ì´ë¼ë©´ ë°”ë¡œ ì¢…ë£Œ
 	if (true == bChooseGrenadeGun) {
 		return;
 	}
-	// È®´ë FOV 30
+	// í™•ëŒ€ FOV 30
 	me->cameraComp->SetFieldOfView(30);
-	// crosshair¸¦ ¾Èº¸ÀÌ°ÔÇÏ°í, È®´ë°æÀ» º¸ÀÌ°ÔÇÏ°í½Í´Ù.
+	// crosshairë¥¼ ì•ˆë³´ì´ê²Œí•˜ê³ , í™•ëŒ€ê²½ì„ ë³´ì´ê²Œí•˜ê³ ì‹¶ë‹¤.
 	crosshairUI->RemoveFromParent();
 	sniperUI->AddToViewport();
 }
 
 void UTPSPlayerFireComponent::OnActionZoomOut()
 {
-	// ¸¸¾à À¯ÅºÀÌ¶ó¸é ¹Ù·Î Á¾·á
+	// ë§Œì•½ ìœ íƒ„ì´ë¼ë©´ ë°”ë¡œ ì¢…ë£Œ
 	if (true == bChooseGrenadeGun) {
 		return;
 	}
-	// È®´ë FOV 90
+	// í™•ëŒ€ FOV 90
 	me->cameraComp->SetFieldOfView(90);
-	// crosshair¸¦ º¸ÀÌ°ÔÇÏ°í, È®´ë°æÀ» ¾Èº¸ÀÌ°ÔÇÏ°í½Í´Ù.
+	// crosshairë¥¼ ë³´ì´ê²Œí•˜ê³ , í™•ëŒ€ê²½ì„ ì•ˆë³´ì´ê²Œí•˜ê³ ì‹¶ë‹¤.
 	crosshairUI->AddToViewport();
 	sniperUI->RemoveFromParent();
 }

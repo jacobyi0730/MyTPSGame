@@ -13,6 +13,7 @@
 #include "TPSPlayerAnim.h"
 #include "TPSPlayerFireComponent.h"
 #include "TPSPlayerMoveComponent.h"
+#include "Components/ProgressBar.h"
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
@@ -86,18 +87,13 @@ void ATPSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
-
-
-
+	hp = maxHp;
 }
 
 // Called every frame
 void ATPSPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
-
 }
 
 // Called to bind functionality to input
@@ -105,11 +101,14 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	moveComp->SetupPlayerInput(PlayerInputComponent);
-	fireComp->SetupPlayerInput(PlayerInputComponent);
-
-	
+	setupInputDelegate.Broadcast(PlayerInputComponent);
+	//moveComp->SetupPlayerInput(PlayerInputComponent);
+	//fireComp->SetupPlayerInput(PlayerInputComponent);
 }
 
+void ATPSPlayer::OnMyHit_Implementation(int damage)
+{
+	hp -= damage;
+}
 
 

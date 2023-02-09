@@ -9,6 +9,8 @@
 #define GRENADE_GUN true
 #define SNIPER_GUN false
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FSetupInputDelegate, class UInputComponent*);
+
 class USpringArmComponent; // 전방선언
 
 UCLASS()
@@ -50,8 +52,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UStaticMeshComponent* sniperMeshComp;
 
-	//=============================================
+	FSetupInputDelegate setupInputDelegate;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int hp;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int maxHp = 100;
+
+	// enemy->player를 공격함.
+	UFUNCTION(BlueprintNativeEvent)
+	void OnMyHit(int damage);
 };
 

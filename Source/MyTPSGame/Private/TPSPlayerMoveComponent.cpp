@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "TPSPlayerMoveComponent.h"
@@ -22,11 +22,9 @@ void UTPSPlayerMoveComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	me = Cast<ATPSPlayer>(GetOwner());
 
-	// ÅÂ¾î³¯ ¶§ ¼Ó·ÂÀ» speedWalk·Î ¼³Á¤ÇÏ°í½Í´Ù.
+	// íƒœì–´ë‚  ë•Œ ì†ë ¥ì„ speedWalkë¡œ ì„¤ì •í•˜ê³ ì‹¶ë‹¤.
 	me->GetCharacterMovement()->MaxWalkSpeed = speedWalk;
-
 }
 
 
@@ -35,7 +33,7 @@ void UTPSPlayerMoveComponent::TickComponent(float DeltaTime, ELevelTick TickType
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// direction ¹æÇâÀ¸·Î ÀÌµ¿ÇÏ°í½Í´Ù.
+	// direction ë°©í–¥ìœ¼ë¡œ ì´ë™í•˜ê³ ì‹¶ë‹¤.
 	FTransform trans(me->GetControlRotation());
 	FVector resultDirection = trans.TransformVector(direction);
 	resultDirection.Z = 0;

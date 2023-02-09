@@ -1,14 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+#include "TPSPlayerBaseComponent.h"
 #include "TPSPlayerMoveComponent.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class MYTPSGAME_API UTPSPlayerMoveComponent : public UActorComponent
+class MYTPSGAME_API UTPSPlayerMoveComponent : public UTPSPlayerBaseComponent
 {
 	GENERATED_BODY()
 
@@ -24,11 +24,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void SetupPlayerInput(class UInputComponent* PlayerInputComponent);
-
-	UPROPERTY()
-	class ATPSPlayer* me;
-
+	virtual void SetupPlayerInput(class UInputComponent* PlayerInputComponent) override;
 
 	void OnAxisHorizontal(float value);
 	void OnAxisVertical(float value);

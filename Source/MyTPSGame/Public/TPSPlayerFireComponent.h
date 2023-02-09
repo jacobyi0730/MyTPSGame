@@ -1,14 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+#include "TPSPlayerBaseComponent.h"
 #include "TPSPlayerFireComponent.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class MYTPSGAME_API UTPSPlayerFireComponent : public UActorComponent
+class MYTPSGAME_API UTPSPlayerFireComponent : public UTPSPlayerBaseComponent
 {
 	GENERATED_BODY()
 
@@ -24,10 +24,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void SetupPlayerInput(class UInputComponent* PlayerInputComponent);
-
-	UPROPERTY()
-	class ATPSPlayer* me;
+	virtual void SetupPlayerInput(class UInputComponent* PlayerInputComponent) override;
 
 
 	void OnMyGunReload();
@@ -36,7 +33,7 @@ public:
 	void OnActionFireReleased();
 	void DoFire();
 
-	// ¸¶¿ì½º ¿ŞÂÊ¹öÆ°À» ´©¸£¸é ÃÑ¾Ë°øÀå¿¡¼­ ÃÑ¾ËÀ» ¸¸µé¾î¼­ ÃÑ±¸À§Ä¡¿¡ ¹èÄ¡ÇÏ°í½Í´Ù.
+	// ë§ˆìš°ìŠ¤ ì™¼ìª½ë²„íŠ¼ì„ ëˆ„ë¥´ë©´ ì´ì•Œê³µì¥ì—ì„œ ì´ì•Œì„ ë§Œë“¤ì–´ì„œ ì´êµ¬ìœ„ì¹˜ì— ë°°ì¹˜í•˜ê³ ì‹¶ë‹¤.
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ABulletActor> bulletFactory;
 	
@@ -52,7 +49,7 @@ public:
 	
 	void ChooseGun(bool bGrenade);
 
-	// À§Á¬°øÀå¿¡¼­ À§Á¬À» »ı¼ºÇÏ°í½Í´Ù. Crosshair, Sniper
+	// ìœ„ì ¯ê³µì¥ì—ì„œ ìœ„ì ¯ì„ ìƒì„±í•˜ê³ ì‹¶ë‹¤. Crosshair, Sniper
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUserWidget> crosshairFactory;
 	UPROPERTY(EditAnywhere)
@@ -63,15 +60,15 @@ public:
 	UPROPERTY()
 	class UUserWidget* sniperUI;
 
-	// 1¹øÅ°¿Í 2¹øÅ°¿¡´ëÇÑ (ÃÑ±³Ã¼)ÀÔ·ÂÃ³¸®¸¦ ÇÏ°í½Í´Ù.
+	// 1ë²ˆí‚¤ì™€ 2ë²ˆí‚¤ì—ëŒ€í•œ (ì´êµì²´)ì…ë ¥ì²˜ë¦¬ë¥¼ í•˜ê³ ì‹¶ë‹¤.
 	void OnActionGrenade();
 	void OnActionSniper();
 
-	// ZoomÀ» ±¸ÇöÇÏ°í½Í´Ù. In / Out
-	void OnActionZoomIn();	// È®´ë FOV 30
-	void OnActionZoomOut();	// Ãà¼Ò FOV 90
+	// Zoomì„ êµ¬í˜„í•˜ê³ ì‹¶ë‹¤. In / Out
+	void OnActionZoomIn();	// í™•ëŒ€ FOV 30
+	void OnActionZoomOut();	// ì¶•ì†Œ FOV 90
 
-	// Æø¹ß°øÀå
+	// í­ë°œê³µì¥
 	UPROPERTY(EditAnywhere)
 	class UParticleSystem* bulletImpactFactory;
 
@@ -85,7 +82,7 @@ public:
 	UPROPERTY()
 	class UCameraShakeBase* canShakeInstance;
 
-	// ÅºÃ¢, ¸®·Îµå µîµî..
+	// íƒ„ì°½, ë¦¬ë¡œë“œ ë“±ë“±..
 
 	void OnActionReload();
 

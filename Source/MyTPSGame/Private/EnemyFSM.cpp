@@ -331,6 +331,7 @@ void UEnemyFSM::SetState(EEnemyState next)
 	currentTime = 0;
 }
 
+// enemy -> player을 공격하는 순간.
 void UEnemyFSM::OnHitEvent()
 {
 	me->enemyAnim->bAttackPlay = false;
@@ -339,7 +340,7 @@ void UEnemyFSM::OnHitEvent()
 	float dist = target->GetDistanceTo(me);
 	if (dist <= attakcRange)
 	{
-		PRINT_LOG(TEXT("Enemy is Attack"));
+		target->OnMyHit(1);
 	}
 }
 
