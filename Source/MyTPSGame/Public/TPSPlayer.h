@@ -43,7 +43,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UTPSPlayerMoveComponent* moveComp;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UTPSPlayerFireComponent* fireComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -62,5 +62,18 @@ public:
 	// enemy->player를 공격함.
 	UFUNCTION(BlueprintNativeEvent)
 	void OnMyHit(int damage);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMyGameOver();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMyChooseGun(bool isGrenadeGun);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMyGrenadGunAmmoUpdate(int current, int max);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMySniperGunAmmoUpdate(int current, int max);
+
 };
 

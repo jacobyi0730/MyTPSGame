@@ -96,5 +96,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int sniperAmmo;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMyGrenadGunAmmoUpdate(int current, int max);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMySniperGunAmmoUpdate(int current, int max);
 		
 };

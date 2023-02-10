@@ -75,11 +75,13 @@ void UTPSPlayerFireComponent::SetupPlayerInput(UInputComponent* PlayerInputCompo
 void UTPSPlayerFireComponent::OnMyGunReload()
 {
 	gunAmmo = maxGunAmmo;
+	me->OnMyGrenadGunAmmoUpdate(gunAmmo, maxGunAmmo);
 }
 
 void UTPSPlayerFireComponent::OnMySniperReload()
 {
 	sniperAmmo = maxSniperAmmo;
+	me->OnMySniperGunAmmoUpdate(sniperAmmo, maxSniperAmmo);
 }
 
 
@@ -90,12 +92,20 @@ void UTPSPlayerFireComponent::OnActionFirePressed()
 	// 그렇지 않으면 총을 쏘지 않겠다...
 	if (bChooseGrenadeGun)
 	{
-		if (gunAmmo > 0) { gunAmmo--; }
+		if (gunAmmo > 0)
+		{
+			gunAmmo--;
+			me->OnMyGrenadGunAmmoUpdate(gunAmmo, maxGunAmmo);
+		}
 		else { return; }
 	}
 	else
 	{
-		if (sniperAmmo > 0) { sniperAmmo--; }
+		if (sniperAmmo > 0)
+		{
+			sniperAmmo--;
+			me->OnMySniperGunAmmoUpdate(sniperAmmo, maxSniperAmmo);
+		}
 		else { return; }
 	}
 
@@ -211,6 +221,8 @@ void UTPSPlayerFireComponent::ChooseGun(bool bGrenade)
 	me->gunMeshComp->SetVisibility(bGrenade);
 	// Not 비트연산
 	me->sniperMeshComp->SetVisibility(!bGrenade);
+
+	me->OnMyChooseGun(bChooseGrenadeGun);
 }
 
 void UTPSPlayerFireComponent::OnActionGrenade()
